@@ -1,0 +1,17 @@
+Ative sua conta — BrickMotors
+
+Olá, {{ user.first_name|default:user.username }}!
+
+Confirme seu e-mail para começar a anunciar e gerenciar seus veículos na BrickMotors.
+
+Confirmar e-mail (acesse este link):
+{{ activation_link }}
+
+Este link expira em {{ expiry_minutes|default:'30' }} minutos.
+
+Se você não fez cadastro, ignore este e-mail.
+
+BrickMotors — Oeste de Santa Catarina
+Suporte: suporte@brickmotors.com
+
+Você recebeu este e-mail porque se cadastrou na BrickMotors.

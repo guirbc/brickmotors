@@ -10,7 +10,9 @@ urlpatterns = [
     path("", include(("market.urls", "market"), namespace="market")),
 
     path("pagamentos/", include(("payments.urls", "payments"), namespace="payments")),
-    path("conta/", include(("django.contrib.auth.urls", "accounts"), namespace="accounts")),
+    
+    path("conta/", include(("brickmotors.accounts.urls", "accounts"), namespace="accounts")),
+
 ]
 
 if settings.DEBUG:

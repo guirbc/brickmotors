@@ -4,8 +4,10 @@ asgiref==3.10.0
 certifi==2025.10.5
 cffi==2.0.0
 charset-normalizer==3.4.4
+cryptography==46.0.3
 dj-database-url==3.0.1
 Django==5.2.7
+django-anymail==13.1
 django-filter==25.2
 django-widget-tweaks==1.5.0
 gunicorn==23.0.0

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Reenviar ativação · BrickMotors{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="card shadow-sm">
+        <div class="card-body p-4">
+          <h1 class="h5 mb-3">Reenviar link de ativação</h1>
+          <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label class="form-label">E-mail</label>
+              <input name="email" type="email" class="form-control" required>
+            </div>
+            <button class="btn btn-primary w-100" type="submit">Enviar</button>
+          </form>
+          <div class="text-center mt-3">
+            <small><a href="{% url 'accounts:login' %}">Voltar ao login</a></small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
