@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Buscar veículos — BrickMotors{% endblock %}
+{% block content %}
+<div class="container py-3">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h4 mb-0">Resultados</h1>
+    <button class="btn btn-outline-light d-lg-none" data-bs-toggle="offcanvas" data-bs-target="#filtros"><i class="bi bi-sliders"></i> Filtros</button>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-lg-3 d-none d-lg-block">
+      {% include "catalog/partials_filters.html" %}
+    </div>
+
+    <div class="col-12 d-lg-none">
+      <div class="offcanvas offcanvas-bottom text-bg-dark" tabindex="-1" id="filtros" style="height:75vh;">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title">Filtros</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body">
+          {% include "catalog/partials_filters.html" %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-9">
+      {% if page_obj and page_obj.object_list %}
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+        {% for v in page_obj.object_list %}
+          <div class="col">
+            <div class="card card-hover h-100 position-relative">
+              {% if v.is_featured %}
+                <span class="ribbon">Destaque</span>
+              {% endif %}
+              {% if v.photos.first %}
+                <img class="card-img-top ratio-16x9 object-cover" src="{{ v.photos.first.image.url }}" alt="">
+              {% else %}
+                <img class="card-img-top ratio-16x9 object-cover" src="https://placehold.co/800x450?text=Sem+foto" alt="">
+              {% endif %}
+              <div class="card-body">
+                <h6 class="mb-1 text-truncate">{{ v.brand }} {{ v.model }}</h6>
+                <small class="text-muted">{{ v.year }} • {{ v.city }}</small>
+                <div class="fw-bold mt-2" style="font-size:1.05rem;">R$ {{ v.price }}</div>
+                {% if v.ad_type == 'repasse' %}
+                  <span class="badge text-bg-secondary mt-2">Oportunidade</span>
+                {% endif %}
+              </div>
+              <div class="card-footer bg-transparent border-0 pt-0">
+                <a class="btn btn-outline-light w-100 btn-sm" href="{% url 'market:veiculo' v.pk v.slug %}">Ver detalhes</a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <nav class="mt-3">
+        <ul class="pagination pagination-sm">
+          {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET %}&{{ request.GET.urlencode|safe }}{% endif %}">«</a></li>
+          {% endif %}
+          <li class="page-item disabled"><span class="page-link">Página {{ page_obj.number }}/{{ page_obj.paginator.num_pages }}</span></li>
+          {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET %}&{{ request.GET.urlencode|safe }}{% endif %}">»</a></li>
+          {% endif %}
+        </ul>
+      </nav>
+      {% else %}
+        <div class="card p-4">
+          <h6 class="mb-1">Nada por aqui…</h6>
+          <p class="text-muted mb-0">Tente remover filtros ou buscar por termos diferentes.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

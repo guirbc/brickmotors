@@ -1,0 +1,98 @@
+/* === BrickMotors Theme ===================================================== */
+:root{
+  --bm-bg:#0b0b0f;          /* fundo app */
+  --bm-surface:#111318;     /* cards/nav */
+  --bm-soft:#1a1d24;        /* superfícies suaves */
+  --bm-border:rgba(255,255,255,.09);
+  --bm-text:#f5f7fb;
+  --bm-muted:#a7afbe;
+  --bm-primary:#ff3b3f;     /* “brick red” */
+  --bm-primary-600:#e33437;
+  --bm-warn:#ffd166;        /* toque quente opcional */
+  --bm-success:#17c964;
+
+  --bm-radius:16px;
+  --bm-radius-pill:999px;
+  --bm-shadow:
+    0 10px 25px rgba(0,0,0,.35),
+    0 1px 0 0 rgba(255,255,255,.03) inset;
+}
+
+html,body{ background:var(--bm-bg); color:var(--bm-text); }
+a{ color:var(--bm-warn); }
+a:hover{ color:#ffe08a; }
+
+.navbar{ background:linear-gradient(180deg, #0d0f14, #0b0b0f); }
+.navbar .btn{ border-color:var(--bm-border); }
+
+.card{
+  background:var(--bm-surface);
+  border:1px solid var(--bm-border);
+  border-radius:var(--bm-radius);
+  box-shadow:var(--bm-shadow);
+}
+.card-img-top{ border-top-left-radius:var(--bm-radius); border-top-right-radius:var(--bm-radius); }
+.object-cover{ object-fit:cover; }
+.ratio-4x3{ aspect-ratio:4/3; }
+.ratio-16x9{ aspect-ratio:16/9; }
+
+.btn{
+  border-radius:var(--bm-radius-pill)!important;
+  border-width:1px;
+}
+.btn-primary{
+  --bs-btn-bg:var(--bm-primary);
+  --bs-btn-hover-bg:var(--bm-primary-600);
+  --bs-btn-border-color:transparent;
+}
+.btn-outline-light{ border-color:var(--bm-border); }
+
+.badge-featured{
+  background: linear-gradient(90deg, var(--bm-warn), #ffe8a9);
+  color:#1b1b1b;
+  font-weight:700;
+}
+
+.ribbon{
+  position:absolute; top:12px; left:-8px;
+  background:var(--bm-primary);
+  color:white; padding:.35rem .6rem; font-weight:700; font-size:.75rem;
+  border-top-right-radius:8px; border-bottom-right-radius:8px;
+  box-shadow:0 6px 14px rgba(0,0,0,.4);
+}
+
+.search-hero{
+  background:linear-gradient(180deg, #141720, #0e1117 70%, transparent);
+  border:1px solid var(--bm-border);
+  border-radius:24px;
+  box-shadow:var(--bm-shadow);
+}
+
+.input-pill, .form-select{
+  background:var(--bm-soft)!important; color:var(--bm-text)!important;
+  border:1px solid var(--bm-border)!important;
+  border-radius:var(--bm-radius-pill)!important;
+  padding:.85rem 1.1rem!important;
+}
+
+.brand-chip{
+  display:inline-flex; align-items:center; gap:.5rem;
+  padding:.45rem .75rem; border-radius:var(--bm-radius-pill);
+  border:1px solid var(--bm-border); background:var(--bm-soft); color:var(--bm-text);
+  font-size:.9rem;
+}
+.brand-chip img{ width:22px; height:22px; border-radius:50%; object-fit:cover; }
+
+.mobile-cta{
+  position: sticky; bottom:0; left:0; right:0;
+  display:flex; gap:.5rem; padding:.75rem; background:rgba(9,10,12,.9);
+  border-top:1px solid var(--bm-border);
+}
+
+/* utilitários */
+.text-muted{ color:var(--bm-muted)!important; }
+.hr-soft{ border-color:var(--bm-border); opacity:1; }
+
+/* Hover “respira” */
+.card-hover:hover{ transform:translateY(-2px); transition:.18s ease; }
+

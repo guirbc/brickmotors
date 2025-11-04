@@ -1,0 +1,27 @@
+<form method="get" class="vstack gap-2">
+  <input class="form-control input-pill" name="q" value="{{ request.GET.q }}" placeholder="Buscar por nome, versão, palavra-chave">
+  <input class="form-control input-pill" name="city" value="{{ request.GET.city }}" placeholder="Cidade">
+  <input class="form-control input-pill" name="brand" value="{{ request.GET.brand }}" placeholder="Marca">
+
+  <div class="d-flex gap-2">
+    <input class="form-control input-pill" name="preco_min" value="{{ request.GET.preco_min }}" placeholder="Preço mín.">
+    <input class="form-control input-pill" name="preco_max" value="{{ request.GET.preco_max }}" placeholder="Preço máx.">
+  </div>
+
+  <details class="mt-1">
+    <summary class="text-muted">Mais filtros</summary>
+    <div class="mt-2">
+      {% with at=request.GET.ad_type %}
+      <label class="small text-muted mb-1">Tipo de anúncio</label>
+      <select class="form-select" name="ad_type">
+        <option value="" {% if not at %}selected{% endif %}>Todos</option>
+        <option value="normal" {% if at == 'normal' %}selected{% endif %}>Normal</option>
+        <option value="repasse" {% if at == 'repasse' %}selected{% endif %}>Repasse</option>
+      </select>
+      {% endwith %}
+    </div>
+  </details>
+
+  <button class="btn btn-primary w-100 mt-2"><i class="bi bi-sliders"></i> Aplicar</button>
+  <a class="btn btn-outline-light w-100" href="{{ request.path }}">Limpar</a>
+</form>

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}BrickMotors — Encontre seu próximo carro{% endblock %}
+{% block content %}
+<section class="py-4">
+  <div class="container">
+    <div class="search-hero p-3 p-md-4">
+      <div class="row align-items-center g-4">
+        <div class="col-lg-6">
+          <h1 class="fw-bold mb-2">Seu carro te espera aqui.</h1>
+          <p class="text-muted mb-3">Busca simples, fotos grandes e contato direto. Repasses? Existem — mas são um extra.</p>
+
+          <form class="vstack gap-2" action="/busca/" method="get">
+            <div class="d-flex gap-2">
+              <input class="form-control input-pill flex-grow-1" type="search" name="q" placeholder="Ex.: Onix 1.0 2020 automático, até 60 mil">
+              <button class="btn btn-primary"><i class="bi bi-search"></i> Buscar</button>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+              <span class="brand-chip"><img src="https://placehold.co/48x48" alt="">Chevrolet</span>
+              <span class="brand-chip"><img src="https://placehold.co/48x48" alt="">Volkswagen</span>
+              <span class="brand-chip"><img src="https://placehold.co/48x48" alt="">Fiat</span>
+              <span class="brand-chip d-none d-md-inline-flex"><img src="https://placehold.co/48x48" alt="">Toyota</span>
+            </div>
+          </form>
+        </div>
+
+        <div class="col-lg-6">
+          <img class="w-100 rounded" src="https://images.unsplash.com/photo-1511919884226-fd3cad34687c?q=80&w=1400&auto=format&fit=crop" alt="">
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-4">
+      <h2 class="h5 mb-2">Lojas Oficiais</h2>
+      <div class="d-flex flex-wrap gap-3">
+        <span class="brand-chip"><img src="https://placehold.co/64x64"> GWM</span>
+        <span class="brand-chip"><img src="https://placehold.co/64x64"> Volvo</span>
+        <span class="brand-chip"><img src="https://placehold.co/64x64"> BMW</span>
+        <span class="brand-chip"><img src="https://placehold.co/64x64"> BYD</span>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
