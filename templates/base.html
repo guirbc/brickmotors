@@ -60,6 +60,8 @@
   {% else %}
     <a class="btn btn-warning btn-sm"
        href="{% url 'accounts:login' %}?next={% url 'market:vehicle_create' %}">Entrar</a>
+    <a class="btn btn-outline-secondary btn-sm ms-2" href="{% url 'accounts:signup' %}">Criar conta</a>
+
   {% endif %}
 </div>
 

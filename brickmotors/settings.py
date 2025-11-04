@@ -27,6 +27,8 @@ INSTALLED_APPS = [
     "django_filters",
     "widget_tweaks",
     "market","payments",
+    "anymail",
+    "brickmotors.accounts",  # <= aqui!
 ]
 
 MIDDLEWARE = [
@@ -120,3 +122,55 @@ MP_WEBHOOK_SECRET = os.getenv("MP_WEBHOOK_SECRET","dev-webhook-secret")
 LOGIN_URL = "/conta/login/"
 LOGIN_REDIRECT_URL = "/"     # depois de logar
 LOGOUT_REDIRECT_URL = "/"    # depois de sair
+# --- Autenticação / redirecionamentos ---
+LOGIN_REDIRECT_URL = "market:home"      # ajuste se teu nome for diferente
+LOGOUT_REDIRECT_URL = "market:home"
+
+# Token de expiração (para o link de ativação)
+PASSWORD_RESET_TIMEOUT = 60 * 60 * 24 * 3  # 3 dias
+
+# --- E-mail ---
+# Em desenvolvimento: imprime os e-mails no console
+EMAIL_BACKEND = os.getenv(
+    "EMAIL_BACKEND",
+    "django.core.mail.backends.console.EmailBackend"
+)
+DEFAULT_FROM_EMAIL = os.getenv(
+    "DEFAULT_FROM_EMAIL",
+    "BrickMotors <no-reply@brickmotors.com>"
+)
+
+# Em produção, defina via .env:
+# EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+# EMAIL_HOST=smtp.sendgrid.net
+# EMAIL_PORT=587
+# EMAIL_HOST_USER=apikey
+# EMAIL_HOST_PASSWORD=xxx
+# EMAIL_USE_TLS=1
+# DEFAULT_FROM_EMAIL="BrickMotors <no-reply@brickmotors.com>"
+# settings.py
+
+ALLOWED_HOSTS = [
+    "localhost", "127.0.0.1",
+    ".app.github.dev", ".githubpreview.dev",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    # local - http e https
+    "http://localhost:8000", "http://127.0.0.1:8000",
+    "https://localhost:8000", "https://127.0.0.1:8000",
+    # Codespaces
+    "https://*.app.github.dev", "https://*.githubpreview.dev",
+]
+
+forward_host = os.getenv("FORWARDED_HOST")
+if forward_host:
+    ALLOWED_HOSTS += [forward_host]
+    CSRF_TRUSTED_ORIGINS += [f"https://{forward_host}"]
+
+EMAIL_BACKEND = "anymail.backends.sendgrid.EmailBackend"
+ANYMAIL = {
+    "SENDGRID_API_KEY": os.getenv("SENDGRID_API_KEY"),
+}
+
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "Brick Motors <brickmotorssc@gmail.com>")
