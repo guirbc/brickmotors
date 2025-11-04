@@ -1,15 +1,17 @@
 from django.contrib import admin
-from .models import Vehicle, VehiclePhoto
+from .models import Vehicle, VehicleImage
 
-class VehiclePhotoInline(admin.TabularInline):
-    model = VehiclePhoto
-    extra = 1
+class VehicleImageInline(admin.TabularInline):
+    model = VehicleImage
+    extra = 0
 
 @admin.register(Vehicle)
 class VehicleAdmin(admin.ModelAdmin):
-    list_display = ("id","brand","model","year","city","price","ad_type","is_featured")
-    list_filter  = ("ad_type","city","brand","year","is_featured")
-    search_fields= ("brand","model","city","title")
-    inlines = [VehiclePhotoInline]
+    list_display = ("title","brand","model","year","price","owner","is_published")
+    list_filter  = ("brand","year","is_published","repass")
+    search_fields = ("title","brand","model","city","state")
+    inlines = [VehicleImageInline]
 
-# Register your models here.
+@admin.register(VehicleImage)
+class VehicleImageAdmin(admin.ModelAdmin):
+    list_display = ("vehicle","order")

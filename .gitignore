@@ -1,10 +1,16 @@
+# Python/Django
 __pycache__/
-*.py[cod]
-db.sqlite3
-.env
+*.pyc
 .venv/
-staticfiles/
-media/
-.DS_Store
-.vscode/
-.idea/
+.env
+.env.local
+.env.*.local
+
+# Django
+db.sqlite3
+/staticfiles/
+/media/
+
+# Node (se usar)
+/node_modules/
+

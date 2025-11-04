@@ -2,9 +2,12 @@ from django.urls import path
 from . import views
 
 app_name = "market"
+
 urlpatterns = [
-    path("", views.HomeView.as_view(), name="home"),
-    path("busca/", views.VehicleListView.as_view(), name="busca"),
-    path("repasses/", views.RepassesListView.as_view(), name="repasses"),
-    path("veiculo/<int:pk>-<slug:slug>/", views.VehicleDetailView.as_view(), name="veiculo"),
+    path("", views.home, name="home"),             # <- nova home
+    path("busca/", views.CatalogView.as_view(), name="catalog"),
+    path("anunciar/", views.vehicle_create, name="vehicle_create"),
+    path("meus-anuncios/", views.my_vehicles, name="my_vehicles"),
+    path("editar/<slug:slug>/", views.vehicle_edit, name="vehicle_edit"),
+    path("<slug:slug>/", views.vehicle_detail, name="vehicle_detail"),
 ]

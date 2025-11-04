@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} — BrickMotors{% endblock %}
+{% block content %}
+<div class="container py-4" style="max-width: 900px;">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h4 mb-0">{{ title }}</h1>
+    <a class="btn btn-outline-secondary btn-sm" href="{% url 'market:my_vehicles' %}">Meus anúncios</a>
+  </div>
+
+  <form method="post" enctype="multipart/form-data" class="card p-3">
+    {% csrf_token %}
+    <div class="row g-3">
+      {% for f in form.visible_fields %}
+        <div class="col-md-6">
+          <label class="form-label">{{ f.label }}</label>
+          {{ f }}
+          {% if f.help_text %}<div class="form-text">{{ f.help_text }}</div>{% endif %}
+          {% for e in f.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+        </div>
+      {% endfor %}
+    </div>
+
+    <hr class="my-4">
+    <h5 class="mb-2">Fotos</h5>
+    {{ formset.management_form }}
+    <div class="row g-3">
+      {% for ff in formset %}
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="border rounded p-2 h-100">
+            <div class="mb-2">
+              <label class="form-label">Imagem</label>
+              {{ ff.image }}
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Ordem</label>
+              {{ ff.order }}
+            </div>
+            <div class="form-check">
+              {{ ff.DELETE }} <label class="form-check-label">Remover</label>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <button class="btn btn-primary mt-3">Salvar</button>
+  </form>
+</div>
+{% endblock %}

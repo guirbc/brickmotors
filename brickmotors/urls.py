@@ -5,6 +5,13 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", include("market.urls")),
-    path("pagamentos/", include("payments.urls")),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+    # raiz do site aponta direto para as URLs do market
+    path("", include(("market.urls", "market"), namespace="market")),
+
+    path("pagamentos/", include(("payments.urls", "payments"), namespace="payments")),
+    path("conta/", include(("django.contrib.auth.urls", "accounts"), namespace="accounts")),
+]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

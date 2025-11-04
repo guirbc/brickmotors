@@ -1,6 +1,9 @@
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+import dj_database_url
+
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
@@ -22,6 +25,7 @@ INSTALLED_APPS = [
     "django.contrib.admin","django.contrib.auth","django.contrib.contenttypes",
     "django.contrib.sessions","django.contrib.messages","django.contrib.staticfiles",
     "django_filters",
+    "widget_tweaks",
     "market","payments",
 ]
 
@@ -52,17 +56,40 @@ TEMPLATES = [{
 
 WSGI_APPLICATION = "brickmotors.wsgi.application"
 
-if os.getenv("POSTGRES_DB"):
-    DATABASES = {"default": {
-        "ENGINE":"django.db.backends.postgresql",
-        "HOST":os.getenv("POSTGRES_HOST","localhost"),
-        "PORT":os.getenv("POSTGRES_PORT","5432"),
-        "NAME":os.getenv("POSTGRES_DB"),
-        "USER":os.getenv("POSTGRES_USER"),
-        "PASSWORD":os.getenv("POSTGRES_PASSWORD"),
-    }}
+# === Banco de dados: prioridade para DATABASE_URL; fallback para POSTGRES_*; senão SQLite
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if DATABASE_URL:
+    # Ex.: postgresql://user:pass@host:5432/dbname  (em produção use ?sslmode=require)
+    DATABASES = {
+        "default": dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=600,                         # pooling simples
+            ssl_require=os.getenv("DB_SSL", "0")=="1"
+        )
+    }
+
+elif os.getenv("POSTGRES_DB"):
+    # Modo que você já usava com variáveis separadas
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "HOST": os.getenv("POSTGRES_HOST", "localhost"),
+            "PORT": os.getenv("POSTGRES_PORT", "5432"),
+            "NAME": os.getenv("POSTGRES_DB"),
+            "USER": os.getenv("POSTGRES_USER"),
+            "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
+        }
+    }
+
 else:
-    DATABASES = {"default":{"ENGINE":"django.db.backends.sqlite3","NAME":BASE_DIR/"db.sqlite3"}}
+    # Dev rápido/local
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME":"django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -89,3 +116,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 MP_ACCESS_TOKEN = os.getenv("MP_ACCESS_TOKEN","")
 MP_PUBLIC_KEY  = os.getenv("MP_PUBLIC_KEY","")
 MP_WEBHOOK_SECRET = os.getenv("MP_WEBHOOK_SECRET","dev-webhook-secret")
+
+LOGIN_URL = "/conta/login/"
+LOGIN_REDIRECT_URL = "/"     # depois de logar
+LOGOUT_REDIRECT_URL = "/"    # depois de sair

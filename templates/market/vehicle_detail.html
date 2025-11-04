@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}{{ v.title }} — BrickMotors{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="row g-4">
+    <div class="col-lg-7">
+      {% if v.images.all %}
+        <img class="w-100 rounded" style="aspect-ratio:16/9;object-fit:cover" src="{{ v.images.all.0.image.url }}" alt="{{ v.title }}">
+        <div class="d-flex gap-2 mt-2 flex-wrap">
+          {% for img in v.images.all|slice:"1:" %}
+            <img src="{{ img.image.url }}" style="width:120px;height:80px;object-fit:cover" class="rounded">
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+    <div class="col-lg-5">
+      <h1 class="h4">{{ v.title }}</h1>
+      <div class="fs-5 fw-semibold mb-2">R$ {{ v.price|floatformat:2 }}</div>
+      <div class="text-muted small mb-3">
+        {{ v.brand }} {{ v.model }} {{ v.version }} • {{ v.year }} • {{ v.mileage }} km<br>
+        {{ v.city }}/{{ v.state }} • {{ v.get_fuel_display }} • {{ v.get_gearbox_display }}
+      </div>
+      <a class="btn btn-primary w-100" href="https://wa.me/{{ v.owner.profile.phone|default_if_none:''|cut:' ' }}" target="_blank">Falar no WhatsApp</a>
+      {% if v.repass %}<div class="mt-2 small text-muted">Anúncio marcado como <strong>Repasse</strong>.</div>{% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
