@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Buscar — BrickMotors{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <form method="get" class="card p-3 mb-3">
+    <div class="row g-2">
+      <div class="col-md-4"><input class="form-control input-pill" type="text" name="q" value="{{ request.GET.q }}" placeholder="Busca"></div>
+      <div class="col-md-2"><input class="form-control input-pill" type="text" name="brand" value="{{ request.GET.brand }}" placeholder="Marca"></div>
+      <div class="col-md-2"><input class="form-control input-pill" type="text" name="model" value="{{ request.GET.model }}" placeholder="Modelo"></div>
+      <div class="col-md-2"><input class="form-control input-pill" type="number" name="year_min" value="{{ request.GET.year_min }}" placeholder="Ano mín."></div>
+      <div class="col-md-2"><input class="form-control input-pill" type="number" name="price_max" value="{{ request.GET.price_max }}" placeholder="Preço máx."></div>
+    </div>
+    <button class="btn btn-primary mt-2">Filtrar</button>
+  </form>
+
+  <div class="row g-3">
+    {% for v in filter.qs %}
+      <div class="col-6 col-md-4 col-lg-3">
+        <a class="text-decoration-none" href="{% url 'market:vehicle_detail' v.slug %}">
+          <div class="card h-100">
+            {% if v.images.all %}
+            <img class="card-img-top" style="aspect-ratio:4/3;object-fit:cover" src="{{ v.images.all.0.image.url }}" alt="{{ v.title }}">
+            {% endif %}
+            <div class="card-body">
+              <div class="small text-muted">{{ v.brand }} • {{ v.model }} • {{ v.year }}</div>
+              <div class="fw-semibold">R$ {{ v.price|floatformat:2 }}</div>
+              <div class="small text-muted">{{ v.city }}/{{ v.state }}</div>
+            </div>
+          </div>
+        </a>
+      </div>
+    {% empty %}
+      <div class="col-12"><div class="card p-4 text-center">Nenhum anúncio encontrado.</div></div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
