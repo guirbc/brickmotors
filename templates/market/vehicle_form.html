@@ -1,49 +1,145 @@
 {% extends "base.html" %}
-{% block title %}{{ title }} — BrickMotors{% endblock %}
+{% load widget_tweaks %}
+
 {% block content %}
-<div class="container py-4" style="max-width: 900px;">
+<div class="container my-4">
   <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h4 mb-0">{{ title }}</h1>
-    <a class="btn btn-outline-secondary btn-sm" href="{% url 'market:my_vehicles' %}">Meus anúncios</a>
+    <h2>Novo anúncio</h2>
+    <a class="btn btn-outline-secondary" href="{% url 'market:my_vehicles' %}">Cancelar</a>
   </div>
 
-  <form method="post" enctype="multipart/form-data" class="card p-3">
+  <form method="post" enctype="multipart/form-data" novalidate>
     {% csrf_token %}
-    <div class="row g-3">
-      {% for f in form.visible_fields %}
-        <div class="col-md-6">
-          <label class="form-label">{{ f.label }}</label>
-          {{ f }}
-          {% if f.help_text %}<div class="form-text">{{ f.help_text }}</div>{% endif %}
-          {% for e in f.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
-        </div>
-      {% endfor %}
-    </div>
+    {{ form.non_field_errors }}
 
-    <hr class="my-4">
-    <h5 class="mb-2">Fotos</h5>
-    {{ formset.management_form }}
     <div class="row g-3">
-      {% for ff in formset %}
-        <div class="col-12 col-md-6 col-lg-4">
-          <div class="border rounded p-2 h-100">
-            <div class="mb-2">
-              <label class="form-label">Imagem</label>
-              {{ ff.image }}
-            </div>
-            <div class="mb-2">
-              <label class="form-label">Ordem</label>
-              {{ ff.order }}
-            </div>
-            <div class="form-check">
-              {{ ff.DELETE }} <label class="form-check-label">Remover</label>
-            </div>
+      <div class="col-md-6">
+        <label class="form-label">Marca</label>
+        {{ form.brand|add_class:"form-control"|attr:"autocomplete:off"|attr:"list:brand-options" }}
+        <datalist id="brand-options"></datalist>
+        {% for e in form.brand.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Modelo</label>
+        {{ form.model|add_class:"form-control"|attr:"autocomplete:off"|attr:"list:model-options" }}
+        <datalist id="model-options"></datalist>
+        {% for e in form.model.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label">Ano</label>
+        {{ form.year|add_class:"form-control" }}
+        {% for e in form.year.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label">Quilometragem (km)</label>
+        {{ form.mileage|add_class:"form-control" }}
+        {% for e in form.mileage.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label">Preço (R$)</label>
+        {{ form.price|add_class:"form-control" }}
+        {% for e in form.price.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label">UF</label>
+        {{ form.state|add_class:"form-select" }}
+        {% for e in form.state.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+      </div>
+
+      <div class="col-md-9">
+        <label class="form-label">Cidade</label>
+        {{ form.city|add_class:"form-control" }}
+        {% for e in form.city.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+      </div>
+
+      <div class="col-12">
+        <label class="form-label">Descrição</label>
+        {{ form.description|add_class:"form-control"|attr:"rows:4" }}
+        {% for e in form.description.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+      </div>
+
+      <!-- Fotos -->
+      <div class="col-12">
+        <label class="form-label d-block">Fotos (até 30) — JPEG/PNG/WebP até 10MB</label>
+        {{ images_formset.management_form }}
+        {% for f in images_formset %}
+          {{ f.id }}
+          <div class="d-flex gap-2 align-items-center mb-2">
+            <div>{{ f.image }}</div>
+            <label class="ms-2">{{ f.is_cover }} capa</label>
           </div>
-        </div>
-      {% endfor %}
+          {% if f.errors %}
+            <div class="text-danger small mb-2">
+              {% for err in f.errors.values %}{{ err }}{% endfor %}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
     </div>
 
-    <button class="btn btn-primary mt-3">Salvar</button>
+    <div class="mt-3">
+      <button type="submit" class="btn btn-danger">Salvar</button>
+    </div>
   </form>
 </div>
+
+<script>
+(() => {
+  const brandInput = document.querySelector('#id_brand');
+  const brandList  = document.querySelector('#brand-options');
+  const modelInput = document.querySelector('#id_model');
+  const modelList  = document.querySelector('#model-options');
+
+  let brandAbort, modelAbort;
+
+  const debounce = (fn, ms=250) => { let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), ms);} };
+  const option = (id,name) => `<option data-id="${id}" value="${name}"></option>`;
+
+  const selectedMakeId = () => {
+    const val = (brandInput.value||'').trim();
+    const match = [...brandList.options].find(o => o.value === val);
+    return match ? match.dataset.id : '';
+  };
+
+  // Marcas
+  const fetchBrands = debounce(async () => {
+    const q = (brandInput.value||'').trim();
+    try {
+      if (brandAbort) brandAbort.abort();
+      brandAbort = new AbortController();
+      const r = await fetch(`/api/makes/?q=${encodeURIComponent(q)}`, {signal: brandAbort.signal});
+      const data = await r.json();
+      brandList.innerHTML = data.results.map(r => option(r.id, r.name)).join('');
+      // mudou marca: limpar modelos
+      modelInput.value = '';
+      modelList.innerHTML = '';
+    } catch (e) { /* noop */ }
+  }, 200);
+
+  // Modelos (depende do id da marca selecionada)
+  const fetchModels = debounce(async () => {
+    const makeId = selectedMakeId();
+    if (!makeId) { modelList.innerHTML = ''; return; }
+    const q = (modelInput.value||'').trim();
+    try {
+      if (modelAbort) modelAbort.abort();
+      modelAbort = new AbortController();
+      const r = await fetch(`/api/models/?make_id=${encodeURIComponent(makeId)}&q=${encodeURIComponent(q)}`, {signal: modelAbort.signal});
+      const data = await r.json();
+      modelList.innerHTML = data.results.map(r => option(r.id, r.name)).join('');
+    } catch (e) { /* noop */ }
+  }, 200);
+
+  if (brandInput) brandInput.addEventListener('input', fetchBrands);
+  if (modelInput) modelInput.addEventListener('input', fetchModels);
+
+  // primeiras sugestões
+  fetchBrands();
+})();
+</script>
 {% endblock %}
