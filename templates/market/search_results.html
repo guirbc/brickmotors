@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Resultados da busca{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h1 class="h4 mb-3">Resultados da busca</h1>
+  <p class="text-muted mb-4">
+    Encontramos {{ vehicles|length }} veículo{{ vehicles|length|pluralize:"s" }}.
+  </p>
+
+  <div class="row g-3">
+    {% for v in vehicles %}
+      <div class="col-md-4">
+        <a href="{% url 'market:vehicle_detail' v.pk %}"
+           class="card h-100 text-decoration-none text-dark">
+
+          {% with cover=v.images.first %}
+            {% if cover %}
+              <img src="{{ cover.image.url }}" class="card-img-top" alt="{{ v }}">
+            {% endif %}
+          {% endwith %}
+
+          <div class="card-body">
+            <h5 class="card-title">{{ v.make }} {{ v.model }}</h5>
+            <p class="card-text mb-1">
+              {{ v.year }} — {{ v.mileage|default:"0" }} km
+            </p>
+            <p class="fw-bold mb-1">R$ {{ v.price|floatformat:0 }}</p>
+            <p class="text-muted small mb-0">
+              {{ v.city }} / {{ v.uf }}
+            </p>
+          </div>
+        </a>
+      </div>
+    {% empty %}
+      <p>Nenhum veículo encontrado.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

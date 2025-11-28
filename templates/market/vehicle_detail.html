@@ -1,28 +1,157 @@
 {% extends "base.html" %}
-{% block title %}{{ v.title }} — BrickMotors{% endblock %}
+{% block title %}{{ vehicle.make }} {{ vehicle.model }} - BrickMotors{% endblock %}
+
 {% block content %}
-<div class="container py-4">
+<div class="container mt-4">
   <div class="row g-4">
-    <div class="col-lg-7">
-      {% if v.images.all %}
-        <img class="w-100 rounded" style="aspect-ratio:16/9;object-fit:cover" src="{{ v.images.all.0.image.url }}" alt="{{ v.title }}">
-        <div class="d-flex gap-2 mt-2 flex-wrap">
-          {% for img in v.images.all|slice:"1:" %}
-            <img src="{{ img.image.url }}" style="width:120px;height:80px;object-fit:cover" class="rounded">
+
+    <!-- COLUNA ESQUERDA: FOTOS -->
+    <div class="col-lg-8">
+      <div class="card mb-3">
+        {% with images=vehicle.images.all %}
+          {% if images %}
+            <!-- Carousel Bootstrap -->
+            <div id="vehicleCarousel{{ vehicle.id }}" class="carousel slide" data-bs-ride="carousel">
+              <div class="carousel-inner">
+                {% for img in images %}
+                  <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                    <img src="{{ img.image.url }}"
+                         class="d-block w-100"
+                         style="max-height: 480px; object-fit: cover;"
+                         alt="{{ vehicle.make }} {{ vehicle.model }}">
+                  </div>
+                {% endfor %}
+              </div>
+              {% if images|length > 1 %}
+                <button class="carousel-control-prev" type="button" data-bs-target="#vehicleCarousel{{ vehicle.id }}" data-bs-slide="prev">
+                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Anterior</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#vehicleCarousel{{ vehicle.id }}" data-bs-slide="next">
+                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Próxima</span>
+                </button>
+              {% endif %}
+            </div>
+          {% else %}
+            <div class="ratio ratio-16x9 d-flex align-items-center justify-content-center bg-light">
+              <span class="text-muted">Sem foto cadastrada</span>
+            </div>
+          {% endif %}
+        {% endwith %}
+      </div>
+
+      <!-- Miniaturas -->
+      {% if vehicle.images.all|length > 1 %}
+        <div class="d-flex flex-wrap gap-2">
+          {% for img in vehicle.images.all %}
+            <img src="{{ img.image.url }}"
+                 alt=""
+                 class="rounded border"
+                 style="width: 90px; height: 60px; object-fit: cover;">
           {% endfor %}
         </div>
       {% endif %}
     </div>
-    <div class="col-lg-5">
-      <h1 class="h4">{{ v.title }}</h1>
-      <div class="fs-5 fw-semibold mb-2">R$ {{ v.price|floatformat:2 }}</div>
-      <div class="text-muted small mb-3">
-        {{ v.brand }} {{ v.model }} {{ v.version }} • {{ v.year }} • {{ v.mileage }} km<br>
-        {{ v.city }}/{{ v.state }} • {{ v.get_fuel_display }} • {{ v.get_gearbox_display }}
+
+    <!-- COLUNA DIREITA: PREÇO + DADOS PRINCIPAIS -->
+    <div class="col-lg-4">
+      <div class="mb-3">
+        <h1 class="h4 mb-1">{{ vehicle.make }} {{ vehicle.model }}</h1>
+        <p class="text-muted mb-1">
+          {{ vehicle.year }} — {{ vehicle.mileage_km|default:"0" }} km
+          {# troque mileage_km pelo nome certo do campo #}
+        </p>
       </div>
-      <a class="btn btn-primary w-100" href="https://wa.me/{{ v.owner.profile.phone|default_if_none:''|cut:' ' }}" target="_blank">Falar no WhatsApp</a>
-      {% if v.repass %}<div class="mt-2 small text-muted">Anúncio marcado como <strong>Repasse</strong>.</div>{% endif %}
+
+      <div class="card mb-3">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-baseline mb-2">
+            <span class="small text-muted">Preço</span>
+            <span class="fw-bold h4 mb-0">
+              R$ {{ vehicle.price|floatformat:0 }}
+            </span>
+          </div>
+
+          <p class="mb-2">
+            <strong>Cidade:</strong> {{ vehicle.city }} / {{ vehicle.uf }}
+          </p>
+
+          <!-- Lugar pra algum destaque, tipo "Único dono", "Revisões em dia" etc -->
+          <p class="small text-muted mb-3">
+            Anúncio publicado em {{ vehicle.created_at|date:"d/m/Y" }}
+          </p>
+
+          <a class="btn btn-danger btn-lg w-100" href="#">
+            Falar no WhatsApp
+          </a>
+        </div>
+      </div>
+
+      <!-- Bloco tipo Webmotors: características resumidas -->
+      <div class="card">
+        <div class="card-body">
+          <h2 class="h6 mb-3">Informações do veículo</h2>
+          <div class="row small">
+            <div class="col-6 mb-2">
+              <div class="text-muted">Ano</div>
+              <div class="fw-semibold">{{ vehicle.year }}</div>
+            </div>
+            <div class="col-6 mb-2">
+              <div class="text-muted">KM</div>
+              <div class="fw-semibold">
+                {{ vehicle.mileage_km|default:"0" }} km
+                {# ajustar nome do campo aqui também #}
+              </div>
+            </div>
+            <div class="col-6 mb-2">
+              <div class="text-muted">Combustível</div>
+              <div class="fw-semibold">{{ vehicle.fuel_type }}</div>
+            </div>
+            <div class="col-6 mb-2">
+              <div class="text-muted">Câmbio</div>
+              <div class="fw-semibold">{{ vehicle.gearbox }}</div>
+            </div>
+            <div class="col-6 mb-2">
+              <div class="text-muted">Carroceria</div>
+              <div class="fw-semibold">{{ vehicle.body_type }}</div>
+            </div>
+            <div class="col-6 mb-2">
+              <div class="text-muted">Cor</div>
+              <div class="fw-semibold">{{ vehicle.color }}</div>
+            </div>
+            <div class="col-6 mb-2">
+              <div class="text-muted">Aceita troca?</div>
+              <div class="fw-semibold">
+                {% if vehicle.accepts_trade %}Sim{% else %}Não{% endif %}
+              </div>
+            </div>
+            <div class="col-6 mb-2">
+              <div class="text-muted">Único dono?</div>
+              <div class="fw-semibold">
+                {% if vehicle.single_owner %}Sim{% else %}Não{% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
+
+  <!-- DESCRIÇÃO -->
+  <div class="row mt-4">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-body">
+          <h2 class="h6 mb-3">Descrição</h2>
+          <p class="mb-0">
+            {{ vehicle.description|linebreaksbr }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 {% endblock %}

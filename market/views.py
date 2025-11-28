@@ -2,6 +2,7 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db import transaction
+from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, ListView, DetailView
@@ -110,3 +111,59 @@ class VehicleDetailView(DetailView):
     model = Vehicle
     template_name = "market/vehicle_detail.html"
     context_object_name = "vehicle"
+
+def search(request):
+    vehicles = (
+        Vehicle.objects
+        .select_related("owner")
+        .prefetch_related("images")
+        .order_by("-created_at")
+    )
+
+    q = (request.GET.get("q") or "").strip()
+    tipo = request.GET.get("tipo")       # carro / moto
+    cond = request.GET.get("cond")       # novo / usado
+    vistoriado = request.GET.get("vistoriado")  # "1" se marcado
+
+    # filtro por texto (campo de busca)
+    if q:
+        vehicles = vehicles.filter(
+            Q(make__icontains=q) |
+            Q(model__icontains=q) |
+            Q(city__icontains=q) |
+            Q(description__icontains=q)
+        )
+
+    # tenta aplicar filtros extras só se o campo existir no model
+    field_names = {f.name for f in Vehicle._meta.get_fields()}
+
+    # tipo: carro/moto
+    if tipo:
+        if "tipo" in field_names:
+            vehicles = vehicles.filter(tipo=tipo)
+        elif "vehicle_type" in field_names:
+            vehicles = vehicles.filter(vehicle_type=tipo)
+
+    # condição: novo/usado
+    if cond:
+        if "condition" in field_names:
+            vehicles = vehicles.filter(condition=cond)
+        elif "is_new" in field_names:
+            is_new = (cond == "novo")
+            vehicles = vehicles.filter(is_new=is_new)
+
+    # vistoriado
+    if vistoriado:
+        if "is_certified" in field_names:
+            vehicles = vehicles.filter(is_certified=True)
+        elif "vistoriado" in field_names:
+            vehicles = vehicles.filter(vistoriado=True)
+
+    context = {
+        "vehicles": vehicles,
+        "q": q,
+        "tipo": tipo,
+        "cond": cond,
+        "vistoriado": vistoriado,
+    }
+    return render(request, "market/search_results.html", context)
